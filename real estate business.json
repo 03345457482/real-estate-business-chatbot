@@ -1,0 +1,183 @@
+{
+  "name": "real estate business",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -976,
+        -240
+      ],
+      "id": "8dc45960-3c17-4ee7-88c7-efb0d6b956fd",
+      "name": "When chat message received",
+      "webhookId": "0cfd2959-5b57-4608-8d08-9b49a9c37e5b"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a professional real estate agent.\n\nFirst, always use the Google Sheets tool to search the FAQ sheet.\n\nIf the user's question matches or contains any words from the \"Question\" column, reply ONLY with the exact text from the \"Answer\" column. Do not add any greeting, thanks, or extra words.\n\nIf no match found, give normal helpful reply in Urdu or English."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -256
+      ],
+      "id": "4960b61b-f0ac-49b1-ac35-202195b86133",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        32
+      ],
+      "id": "6c2412fd-12a5-4e0f-9d00-39b6a7735a1b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "pccDxAfaIgzDyjRk",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        -32
+      ],
+      "id": "15b7e47f-ae18-4349-88bd-fc95321164c6",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ceIR6xFNLhA69b2a4e0Tfqc2a5qE852Mq2eYFLF6CDQ",
+          "mode": "list",
+          "cachedResultName": "real_estate_faqs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ceIR6xFNLhA69b2a4e0Tfqc2a5qE852Mq2eYFLF6CDQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ceIR6xFNLhA69b2a4e0Tfqc2a5qE852Mq2eYFLF6CDQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "4c87aac1-d491-474b-97b5-d065b74186da",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9iQPwHTNIRg8yixH",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "faqs ",
+        "jsCode": "// N8N Code Tool mein ye code daal kar test karein:\nconst sheets = await $googleSheets.getSheetData({\n  spreadsheetId: '1ccf86cYRLhA6BbE4e8f7ec2a5eE852Wg2eYFLF6C00', \n  range: 'Sheet1!A:B'\n});\n\nconsole.log('Raw Data:', sheets);\nconsole.log('Data Length:', sheets.length);\nconsole.log('First Row:', sheets[0]);\n\nreturn sheets.length > 0 ? `Found ${sheets.length} FAQs` : \"No data found\";"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        -48
+      ],
+      "id": "2092d9fb-3766-4d55-a8df-9aeb00c38c71",
+      "name": "Code Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "a2788abb-9e04-4685-82e6-fa43b246bddf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6f2fdb18172a76269c84588cc1109371bc9acf05617e88bcece98dbf8abf31b"
+  },
+  "id": "equg134hAvVAWy8H",
+  "tags": []
+}
